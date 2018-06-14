@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.constant.RoleConstant;
@@ -24,10 +25,12 @@ public class BaseUserService implements UserService {
 	@Override
 	public boolean insert(UserEntity userEntity) {
 		String username = userEntity.getUsername();
-		log.debug(username);
 		if (exist(username))
 			return false;
+		String password = userEntity.getPassword();
+		userEntity.setPassword(new BCryptPasswordEncoder().encode(password));
 		userEntity.setRoles(RoleConstant.ROLE_USER);
+		log.info(userEntity.toString());
 		int result = userMapper.insert(userEntity);
 		return result == 1;
 	}
